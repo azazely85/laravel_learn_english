@@ -61,7 +61,8 @@ class User extends Authenticatable
      * @return LengthAwarePaginator
      */
     public static function getUsers($with = [], $perPage = User::PER_PAGE_DEFAULT,
-                                    $sortType = false, $sortBy = 'created_at'): LengthAwarePaginator
+                                    $sortType = false, $sortBy = 'created_at'
+    ): LengthAwarePaginator
     {
         $query = new User();
 

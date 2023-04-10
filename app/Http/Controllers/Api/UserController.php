@@ -18,7 +18,7 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
-        return response()->json(['status' => 'success', 'data' => $user],200);
+        return response()->json(['status' => 'success', 'data' => $user], 200);
 
     }
 
@@ -33,7 +33,7 @@ class UserController extends Controller
         $user->first_login = 0;
         $user->save();
 
-        return $this->return_success(true,'Password successfully updated!');
+        return $this->return_success(true, 'Password successfully updated!');
     }
 
     /** Send Password Reset Link Action
@@ -44,7 +44,7 @@ class UserController extends Controller
     {
 
         $users = User::getUsers([],
-            $request->get('per_page'),$request->get('sortType'),
+            $request->get('per_page'), $request->get('sortType'),
             $request->get('sortBy'));
 
         return $this->return_success($users);

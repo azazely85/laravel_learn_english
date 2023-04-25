@@ -18,7 +18,7 @@ class WordController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function getWord(Request $request)
+    public function getWord(Request $request): JsonResponse
     {
         $checkWord = Word::where('name', $request->get('name'))
             ->orWhere('prsi', $request->get('name'))
@@ -33,9 +33,10 @@ class WordController extends Controller
         if ($checkWord) {
             dd($checkWord->translate);
         }
-        $veb_forms = '';
-        $baseService = new BaseService('https://www.oxfordlearnersdictionaries.com/search/english/?q=', [], false,
-            'oxford');
+        $vebForms = '';
+        $baseService = new BaseService('https://www.oxfordlearnersdictionaries.com/search/english/?q=',
+            [], false, 'oxford'
+        );
         $result = $baseService->getContents($request->get('name'));
 
         $wordName = '';
@@ -46,12 +47,12 @@ class WordController extends Controller
         $clearData = $dom->getElementById('entryContent');
         $data = $this->getElementsByClass($clearData, 'h1', 'headword');
         $allowed = "/[^a-z\\040\\.\\-\/]/i";
-        foreach ($data as $paralax) {
-            $wordName = preg_replace($allowed, "", trim($paralax->nodeValue));
+        foreach ($data as $element) {
+            $wordName = preg_replace($allowed, "", trim($element->nodeValue));
         }
         $data = $this->getElementsByClass($clearData, 'span', 'pos');
-        foreach ($data as $paralax) {
-            $wordType = $paralax->nodeValue;
+        foreach ($data as $element) {
+            $wordType = $element->nodeValue;
         }
         $checkWord = Word::where('name', $wordName)
             ->orWhere('prsi', $wordName)
@@ -70,70 +71,71 @@ class WordController extends Controller
             dd($checkWord);
         }
         $data = $this->getElementsByClass($clearData, 'div', 'parallax-container');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'span', 'dictlink-g');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'a', 'topic');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
 
         $data = $this->getElementsByClass($clearData, 'div', 'audio_play_button');
-        foreach ($data as $paralax) {
-            $name = mb_strtolower(preg_replace('/\s+/', '_', $paralax->getAttribute('title')));
+        foreach ($data as $element) {
+            $name = mb_strtolower(preg_replace('/\s+/', '_', $element->getAttribute('title')));
             if (!Storage::disk('local')->exists($name . '.mp3')) {
-                $baseService = new BaseService($paralax->getAttribute('data-src-mp3'), [], false,
-                    'oxford');
+                $baseService = new BaseService($element->getAttribute('data-src-mp3'), [], false,
+                    'oxford'
+                );
                 $baseService->saveMp3($name);
             }
-            $paralax->setAttribute('data-src-mp3', 'http://laravel.local/api/world/voice/' . $name . '_mp3');
-            $paralax->setAttribute('data-src-ogg', 'none');
+            $element->setAttribute('data-src-mp3', 'http://laravel.local/api/world/voice/' . $name . '_mp3');
+            $element->setAttribute('data-src-ogg', 'none');
         }
 
         $data = $this->getElementsByClass($clearData, 'span', 'topic-g');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'span', 'jumplinks');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'a', 'responsive_display_inline_on_smartphone');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'div', 'pron-link');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'div', 'pron-link');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'span', 'xref_to_full_entry');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'a', 'oup_icons');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'div', 'symbols');
-        foreach ($data as $paralax) {
-            $paralax->parentNode->removeChild($paralax);
+        foreach ($data as $element) {
+            $element->parentNode->removeChild($element);
         }
         $count = 1;
         $data = $this->getElementsByClass($clearData, 'a', 'oup_icons');
-        foreach ($data as $paralax) {
+        foreach ($data as $element) {
             $count++;
             if ($count == 1) {
                 continue;
             }
-            $paralax->parentNode->removeChild($paralax);
+            $element->parentNode->removeChild($element);
         }
         $data = $this->getElementsByClass($clearData, 'span', 'inflected_form');
         $i = 0;
@@ -147,32 +149,32 @@ class WordController extends Controller
         $pasp2 = '';
         $ing = '';
         if ($wordType == 'adjective') {
-            foreach ($data as $paralax) {
+            foreach ($data as $element) {
                 if ($i == 0) {
-                    $comparative = trim($paralax->nodeValue);
+                    $comparative = trim($element->nodeValue);
                 }
                 if ($i == 1) {
-                    $superlative = trim($paralax->nodeValue);
+                    $superlative = trim($element->nodeValue);
                 }
                 $i++;
-                $veb_forms .= trim($paralax->nodeValue) . ', ';
+                $vebForms .= trim($element->nodeValue) . ', ';
             }
         }
 
         $data = $this->getElementsByClass($clearData, 'span', 'box_title');
 
-        foreach ($data as $paralax) {
-            if ($paralax->nodeValue == 'Oxford Collocations Dictionary') {
-                $paralax->parentNode->parentNode->parentNode->removeChild($paralax->parentNode->parentNode);
+        foreach ($data as $element) {
+            if ($element->nodeValue == 'Oxford Collocations Dictionary') {
+                $element->parentNode->parentNode->parentNode->removeChild($element->parentNode->parentNode);
                 continue;
             }
-            if ($paralax->nodeValue == 'Extra Examples') {
-                $paralax->parentNode->parentNode->removeChild($paralax->parentNode);
+            if ($element->nodeValue == 'Extra Examples') {
+                $element->parentNode->parentNode->removeChild($element->parentNode);
                 continue;
             }
 
-            if ($paralax->nodeValue == 'Verb Forms') {
-                $newData = $paralax->parentNode->parentNode;
+            if ($element->nodeValue == 'Verb Forms') {
+                $newData = $element->parentNode->parentNode;
                 $newData = $dom->saveXML($newData);
                 $dom2 = new \DOMDocument();
                 $dom2->loadHTML($newData);
@@ -220,7 +222,7 @@ class WordController extends Controller
                             $ing = trim(str_replace($replacement, "", $vebForm->nodeValue));
                         }
                         $i++;
-                        $veb_forms .= trim(str_replace($replacement, "", $vebForm->nodeValue)) . ', ';
+                        $vebForms .= trim(str_replace($replacement, "", $vebForm->nodeValue)) . ', ';
                     }
                 } else {
                     foreach ($vebFormsData as $vebForm) {
@@ -246,7 +248,7 @@ class WordController extends Controller
                             $ing = trim(str_replace($replacement, "", $vebForm->nodeValue));
                         }
                         $i++;
-                        $veb_forms .= trim(str_replace($replacement, "", $vebForm->nodeValue)) . ', ';
+                        $vebForms .= trim(str_replace($replacement, "", $vebForm->nodeValue)) . ', ';
                     }
                 }
 
@@ -254,50 +256,51 @@ class WordController extends Controller
             }
         }
 
-        $veb_forms = mb_substr($veb_forms, 0, mb_strlen($veb_forms) - 2);
+        $vebForms = mb_substr($vebForms, 0, mb_strlen($vebForms) - 2);
         echo '///////////////////////////////////////////////////////////////////////////////////////////////';
-        echo $veb_forms;
+        echo $vebForms;
         echo '///////////////////////////////////////////////////////////////////////////////////////////////';
         $data = $this->getElementsByClass($clearData, 'a', 'ref');
-        foreach ($data as $paralax) {
-            $check = WordToParse::where('name', $paralax->nodeValue)->first();
-            $checkWord = Word::where('prsi', $paralax->nodeValue)
-                ->orWhere('prsh', $paralax->nodeValue)
-                ->orWhere('pas', $paralax->nodeValue)
-                ->orWhere('pasp', $paralax->nodeValue)
-                ->orWhere('ing', $paralax->nodeValue)
-                ->orWhere('comparative', $paralax->nodeValue)
-                ->orWhere('superlative', $paralax->nodeValue)
+        foreach ($data as $element) {
+            $check = WordToParse::where('name', $element->nodeValue)->first();
+            $checkWord = Word::where('prsi', $element->nodeValue)
+                ->orWhere('prsh', $element->nodeValue)
+                ->orWhere('pas', $element->nodeValue)
+                ->orWhere('pasp', $element->nodeValue)
+                ->orWhere('ing', $element->nodeValue)
+                ->orWhere('comparative', $element->nodeValue)
+                ->orWhere('superlative', $element->nodeValue)
                 ->orWhere('plural', $wordName)
                 ->first();
             if (!$check && !$checkWord) {
-                WordToParse::create(['url' => $paralax->getAttribute('href'), 'name' => $paralax->nodeValue]);
+                WordToParse::create(['url' => $element->getAttribute('href'), 'name' => $element->nodeValue]);
             }
-            $paralax->setAttribute('href', '/word/' . mb_strtolower(preg_replace('/\s+/', '_', $paralax->nodeValue)));
+            $element->setAttribute('href', '/word/' . mb_strtolower(preg_replace('/\s+/', '_',
+                    $element->nodeValue)));
         }
         $data = $this->getElementsByClass($clearData, 'span', 'xr-g');
-        foreach ($data as $paralax) {
-            $paralax->removeAttribute('href');
+        foreach ($data as $element) {
+            $element->removeAttribute('href');
         }
         $data = $this->getElementsByClass($clearData, 'span', 'def');
-        foreach ($data as $paralax) {
-            $paralax->removeAttribute('htag');
-            $paralax->removeAttribute('hclass');
+        foreach ($data as $element) {
+            $element->removeAttribute('htag');
+            $element->removeAttribute('hclass');
         }
         $data = $this->getElementsByClass($clearData, 'h2', 'shcut');
-        foreach ($data as $paralax) {
-            $paralax->removeAttribute('htag');
-            $paralax->removeAttribute('hclass');
-            $paralax->removeAttribute('id');
+        foreach ($data as $element) {
+            $element->removeAttribute('htag');
+            $element->removeAttribute('hclass');
+            $element->removeAttribute('id');
         }
         $data = $this->getElementsByClass($clearData, 'span', 'grammar');
-        foreach ($data as $paralax) {
-            $paralax->removeAttribute('htag');
-            $paralax->removeAttribute('hclass');
+        foreach ($data as $element) {
+            $element->removeAttribute('htag');
+            $element->removeAttribute('hclass');
         }
         $data = $this->getElementsByClass($clearData, 'span', 'shcut-g');
-        foreach ($data as $paralax) {
-            $paralax->removeAttribute('id');
+        foreach ($data as $element) {
+            $element->removeAttribute('id');
         }
 
         $clearDataRing = $dom->getElementById('ring-links-box');
@@ -306,8 +309,7 @@ class WordController extends Controller
         $translate = '';
 
         if (!$translate) {
-            $baseService = new BaseService('https://e2u.org.ua/s?w=', [], false,
-                'dict');
+            $baseService = new BaseService('https://e2u.org.ua/s?w=', [], false, 'dict');
             $result = $baseService->getContents($wordName . '&dicts=all');
             libxml_use_internal_errors(true);
             $domUa = new \DOMDocument();
@@ -325,8 +327,8 @@ class WordController extends Controller
 
             if ($clearDataUa) {
                 $dataUa = $this->getElementsByClass($clearDataUa, 'td', 'result_row_main');
-                foreach ($dataUa as $paralax) {
-                    $translate .= $paralax->nodeValue . ', ';
+                foreach ($dataUa as $element) {
+                    $translate .= $element->nodeValue . ', ';
                 }
                 $translate = stristr($translate, '1');
                 $pos = strpos($translate, '2');
@@ -336,8 +338,11 @@ class WordController extends Controller
         }
 
         if (!$translate) {
-            $baseService = new BaseService('https://dict.com/%D0%B0%D0%BD%D0%B3%D0%BB%D1%96%D0%B8%D1%81%D1%8C%D0%BA%D0%BE-%D1%83%D0%BA%D1%80%D0%B0%D1%96%D0%BD%D1%81%D1%8C%D0%BA%D0%B8%D0%B8/', [], false,
-                'dict');
+            $baseService = new BaseService('https://dict.com/%D0%B0%D0%BD%D0%B3%D0%BB%D1%96%D0%B8%D1%81%D1%8C%D0%BA%D0%BE-%D1%83%D0%BA%D1%80%D0%B0%D1%96%D0%BD%D1%81%D1%8C%D0%BA%D0%B8%D0%B8/',
+                [],
+                false,
+                'dict'
+            );
             $result = $baseService->getContents($wordName);
             libxml_use_internal_errors(true);
             $domUa = new \DOMDocument();
@@ -346,41 +351,39 @@ class WordController extends Controller
 
 
             $dataUa = $this->getElementsByClass($clearDataUa, 'span', 'lex_ful_tran');
-            foreach ($dataUa as $paralax) {
-                $translate .= $paralax->nodeValue . ', ';
+            foreach ($dataUa as $element) {
+                $translate .= $element->nodeValue . ', ';
             }
             if (!$translate) {
                 $dataUa = $this->getElementsByClass($clearDataUa, 'span', 'lex_ful_coll2t');
-                foreach ($dataUa as $paralax) {
-                    $translate .= $paralax->nodeValue . ', ';
+                foreach ($dataUa as $element) {
+                    $translate .= $element->nodeValue . ', ';
                 }
             }
         }
 
 
         $translate = mb_substr($translate, 0, mb_strlen($translate) - 2);
-//        $translate = '';
         echo $translate;
         echo $data;
-//        dd(strlen($data));
         $plural = '';
         if ($wordName != trim($request->get('name'))) {
             $plural = $request->get('name');
         }
-        $word = Word::create(['name' => $wordName, 'type' => $wordType, 'description' => $data, 'veb_forms' => $veb_forms,
-            'translate' => $translate, 'comparative' => $comparative, 'superlative' => $superlative, 'prsi' => $prsi,
-            'prsh' => $prsh, 'pas' => $pas, 'pas2' => $pas2, 'pasp' => $pasp, 'pasp2' => $pasp2, 'ing' => $ing,
-            'plural' => $plural]);
+        $word = Word::create(['name' => $wordName, 'type' => $wordType, 'description' => $data,
+            'veb_forms' => $vebForms, 'translate' => $translate, 'comparative' => $comparative,
+            'superlative' => $superlative, 'prsi' => $prsi, 'prsh' => $prsh, 'pas' => $pas, 'pas2' => $pas2,
+            'pasp' => $pasp, 'pasp2' => $pasp2, 'ing' => $ing, 'plural' => $plural]);
         $user = User::find(2);
         $user->words()->attach($word->id);
-        return;
+        dd(1);
         $user = auth()->user();
-
+        $user->words()->attach($word->id);
         return response()->json(['status' => 'success', 'data' => $user], 200);
 
     }
 
-    function getUserWords(Request $request)
+    public function getUserWords(Request $request): JsonResponse
     {
         $authUser = Auth::id();
         $words = User::where('users.id', $authUser)
@@ -392,14 +395,14 @@ class WordController extends Controller
         return response()->json(['status' => 'success', 'data' => $words], 200);
     }
 
-    function voice(Request $request, $id)
+    public function voice(Request $request, $id): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $filePath = storage_path() . '/app/' . $id;
         $filePath = str_replace('_mp3', '.mp3', $filePath);
         return response()->file($filePath);
     }
 
-    function getElementsByClass(&$parentNode, $tagName, $className)
+    protected function getElementsByClass(&$parentNode, $tagName, $className): array
     {
         $nodes = array();
 

@@ -17,7 +17,7 @@ class LearningController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function getTranslateWord(Request $request)
+    public function getTranslateWord(Request $request): JsonResponse
     {
         $authUser = Auth::id();
         $words = User::where('users.id', $authUser)
@@ -35,9 +35,7 @@ class LearningController extends Controller
             shuffle($toTranslate);
             $word->checkName = $toTranslate;
         }
-
         return response()->json(['status' => 'success', 'data' => $words], 200);
-
     }
 
     /**
@@ -80,14 +78,14 @@ class LearningController extends Controller
 
         foreach ($words as &$word) {
             $spells = str_split($word->name);
-            $spell_names = [];
+            $spellNames = [];
             foreach ($spells as $spell) {
-                $spell_names[] = [
+                $spellNames[] = [
                     'character' => $spell,
                     'show' => false
                 ];
             }
-            $word->spell = $spell_names;
+            $word->spell = $spellNames;
         }
         return response()->json(['status' => 'success', 'data' => $words], 200);
 
@@ -114,28 +112,64 @@ class LearningController extends Controller
         return response()->json(['status' => 'success', 'data' => 'nice'], 200);
     }
 
+    public function changeRepeat(Request $request): JsonResponse
+    {
+        $authUser = Auth::id();
+        $word = UserWord::where('user_id', $authUser)
+            ->where('word_id', $request->get('id'))->first();
+        if ($request->get('check')) {
+            $word->update(['count_repeat' => $word->count_repeat + 1,
+                'start_repeat' => Carbon::now()->addDays($word->count_repeat + 1)]);
+        } elseif ($word->count_repeat - 1 >= 0) {
+            $word->update(['count_repeat' => $word->count_repeat - 1,
+                'start_repeat' => Carbon::now()->addDays($word->count_repeat - 1)]);
+        }
+        return response()->json(['status' => 'success', 'data' => 'nice'], 200);
+    }
+
     /**
      * @param Request $request
      * @return JsonResponse
      */
-    public function countRepeat(Request $request)
+    public function countRepeat(Request $request): JsonResponse
     {
         $authUser = Auth::id();
-        $from1 = Carbon::now()->subDay();
-        $from2 = Carbon::now()->subDays(3);
-        $from3 = Carbon::now()->subDays(5);
+        $from = Carbon::now()->subDay();
         $wordsCount = UserWord::where('user_id', $authUser)
             ->where('tw', 1)
             ->where('wt', 1)
             ->where('audio_test', 1)
-            ->where(function ($query) use ($from1, $from2, $from3) {
-                $query->orWhere('start_repeat', '<', $from1)
-                    ->orWhere('start_repeat', '<', $from2)
-                    ->orWhere('start_repeat', '<', $from3);
-            })
+            ->where('start_repeat', '<', $from)
             ->count();
 
         return response()->json(['status' => 'success', 'data' => $wordsCount], 200);
+    }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getRepeat(Request $request): JsonResponse
+    {
+        $authUser = Auth::id();
+        $from = Carbon::now()->subDay();
+        $words = UserWord::where('user_id', $authUser)
+            ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
+            ->where('tw', 1)
+            ->where('wt', 1)
+            ->where('audio_test', 1)
+            ->where('start_repeat', '<', $from)
+            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type')
+            ->limit(6)
+            ->get();
+        foreach ($words as &$word) {
+            $toTranslate = Word::select('translate')->limit(1)->inRandomOrder()->pluck('translate')->toArray();
+            if (!in_array($word->translate, $toTranslate)) {
+                $toTranslate[] = $word->translate;
+            }
+            shuffle($toTranslate);
+            $word->checkTranslate = $toTranslate;
+        }
+        return response()->json(['status' => 'success', 'data' => $words], 200);
     }
 }

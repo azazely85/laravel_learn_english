@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,16 +61,16 @@ class UserController extends Controller
     {
         try {
             if (!User::where('id', $id)->exists()) {
-                throw new \Exception('User not found');
+                throw new Exception('User not found');
             }
             $authUser = Auth::id();
             if ($authUser == $id) {
-                throw new \Exception('You can\'t delete yourself');
+                throw new Exception('You can\'t delete yourself');
             }
             $user = User::find($id);
             $user->forceDelete();
             return $this->return_success(true, 'User successfully deleted');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->return_error($e->getMessage());
         }
     }
@@ -84,11 +85,11 @@ class UserController extends Controller
     {
         try {
             if (!User::where('id', $id)->exists()) {
-                throw new \Exception('User not found');
+                throw new Exception('User not found');
             }
             $authUser = Auth::id();
             if ($authUser == $id) {
-                throw new \Exception('You can\'t change role yourself');
+                throw new Exception('You can\'t change role yourself');
             }
             $user = User::find($id);
             if ($user->role == 1) {
@@ -97,7 +98,7 @@ class UserController extends Controller
                 $user->update(['role' => 1]);
             }
             return $this->return_success(true, 'User role successfully updated');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->return_error($e->getMessage());
         }
     }

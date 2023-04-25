@@ -30,7 +30,7 @@ class ResetPasswordLink implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         Password::sendResetLink(
             $this->email

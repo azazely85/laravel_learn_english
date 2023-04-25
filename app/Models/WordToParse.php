@@ -2,9 +2,25 @@
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\WordToParse
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $url
+ * @method static Builder|WordToParse newModelQuery()
+ * @method static Builder|WordToParse newQuery()
+ * @method static Builder|WordToParse query()
+ * @method static Builder|WordToParse whereId($value)
+ * @method static Builder|WordToParse whereName($value)
+ * @method static Builder|WordToParse whereUrl($value)
+ * @mixin Eloquent
+ */
 class WordToParse extends Model
 {
 
@@ -30,8 +46,8 @@ class WordToParse extends Model
      * @param string $sortBy
      * @return LengthAwarePaginator
      */
-    public static function getWords($with = [], $perPage = WordToParse::PER_PAGE_DEFAULT,
-                                    $sortType = false, $sortBy = 'created_at'): LengthAwarePaginator
+    public static function getWords(array $with = [], int $perPage = WordToParse::PER_PAGE_DEFAULT,
+                                    bool  $sortType = false, string $sortBy = 'created_at'): LengthAwarePaginator
     {
         $query = new User();
 

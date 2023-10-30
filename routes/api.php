@@ -27,7 +27,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::post('forget-password', [AuthController::class, 'sendResetLink']);
-    Route::post('reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+    Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
     Route::group(['middleware' => 'auth:sanctum'], function() {
         Route::post('logout', [AuthController::class, 'logout']);
@@ -50,8 +50,9 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::get('learning/words_translate', [LearningController::class, 'getWordTranslate']);
         Route::get('learning/audio_words', [LearningController::class, 'getWordAudio']);
         Route::get('learning/change_status', [LearningController::class, 'changeStatus']);
+        Route::get('learning/change_status_id', [LearningController::class, 'changeStatusId']);
         Route::get('learning/change_repeat', [LearningController::class, 'changeRepeat']);
-        Route::get('learning/count_repeat', [LearningController::class, 'countRepeat']);
+        Route::get('learning/count', [LearningController::class, 'count']);
         Route::get('learning/get_repeat', [LearningController::class, 'getRepeat']);
         Route::delete('user/{id}', [UserController::class, 'destroy']);
     });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserWord;
 use App\Models\Word;
 use App\Models\WordToParse;
 use App\MyClasses\BaseService;
@@ -31,6 +32,16 @@ class WordController extends Controller
             ->orWhere('superlative', $request->get('name'))
             ->first();
         if ($checkWord) {
+            $user = User::find(2);
+            $word = UserWord::where('user_id', 2)
+                ->where('word_id', $checkWord->id)->first();
+            if (!$word) {
+                $user->words()->attach($checkWord->id);
+                $word = UserWord::where('user_id', 1)
+                    ->where('word_id', $checkWord->id)->first();
+            }
+            $word->update(['audio_test' => 0,
+                'tw' => 0, 'wt' => 1]);
             dd($checkWord->translate);
         }
         $vebForms = '';
@@ -304,7 +315,9 @@ class WordController extends Controller
         }
 
         $clearDataRing = $dom->getElementById('ring-links-box');
-        $clearDataRing->parentNode->removeChild($clearDataRing);
+        if($clearDataRing) {
+            $clearDataRing->parentNode->removeChild($clearDataRing);
+        }
         $data = $dom->saveXML($clearData);
         $translate = '';
 
@@ -364,18 +377,24 @@ class WordController extends Controller
 
 
         $translate = mb_substr($translate, 0, mb_strlen($translate) - 2);
+        if (mb_strlen($translate) > 500) {
+            $translate = mb_substr($translate, 0, mb_strlen($translate) - (mb_strlen($translate) - 499));
+        }
         echo $translate;
         echo $data;
         $plural = '';
         if ($wordName != trim($request->get('name'))) {
             $plural = $request->get('name');
         }
-        $word = Word::create(['name' => $wordName, 'type' => $wordType, 'description' => $data,
-            'veb_forms' => $vebForms, 'translate' => $translate, 'comparative' => $comparative,
-            'superlative' => $superlative, 'prsi' => $prsi, 'prsh' => $prsh, 'pas' => $pas, 'pas2' => $pas2,
-            'pasp' => $pasp, 'pasp2' => $pasp2, 'ing' => $ing, 'plural' => $plural]);
         $user = User::find(2);
-        $user->words()->attach($word->id);
+        if ($wordName) {
+            $word = Word::create(['name' => $wordName, 'type' => $wordType, 'description' => $data,
+                'veb_forms' => $vebForms, 'translate' => $translate, 'comparative' => $comparative,
+                'superlative' => $superlative, 'prsi' => $prsi, 'prsh' => $prsh, 'pas' => $pas, 'pas2' => $pas2,
+                'pasp' => $pasp, 'pasp2' => $pasp2, 'ing' => $ing, 'plural' => $plural]);
+
+            $user->words()->attach($word->id);
+        }
         dd(1);
         $user = auth()->user();
         $user->words()->attach($word->id);
@@ -405,14 +424,16 @@ class WordController extends Controller
     protected function getElementsByClass(&$parentNode, $tagName, $className): array
     {
         $nodes = array();
-
-        $childNodeList = $parentNode->getElementsByTagName($tagName);
-        for ($i = 0; $i < $childNodeList->length; $i++) {
-            $temp = $childNodeList->item($i);
-            if (stripos($temp->getAttribute('class'), $className) !== false) {
-                $nodes[] = $temp;
+        if ($parentNode) {
+            $childNodeList = $parentNode->getElementsByTagName($tagName);
+            for ($i = 0; $i < $childNodeList->length; $i++) {
+                $temp = $childNodeList->item($i);
+                if (stripos($temp->getAttribute('class'), $className) !== false) {
+                    $nodes[] = $temp;
+                }
             }
         }
+
 
         return $nodes;
     }

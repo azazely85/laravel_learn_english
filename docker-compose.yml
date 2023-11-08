@@ -1,0 +1,45 @@
+version: '3'
+services:
+
+    #PHP
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: habib/php
+        container_name: app
+        restart: unless-stopped
+        tty: true
+        environment:
+            SERVICE_NAME: app
+            SERVICE_TAGS: dev
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+            - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        networks:
+            - app-network
+
+    #Nginx
+    webserver:
+        image: nginx:alpine
+        container_name: webserver
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "8989:80"
+            - "443:443"
+        volumes:
+            - ./:/var/www
+            - ./nginx/:/etc/nginx/conf.d/
+        networks:
+            - app-network
+
+#Networks
+networks:
+    app-network:
+        driver: bridge
+#Volumes
+volumes:
+    dbdata:
+        driver: local

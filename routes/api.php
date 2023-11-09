@@ -4,8 +4,8 @@
 use App\Http\Controllers\Api\LearningController;
 use App\Http\Controllers\Api\WordController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\Auth\AuthController;
-use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------

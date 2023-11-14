@@ -24,7 +24,7 @@ class LearningController extends Controller
             ->leftJoin('user_word', 'user_word.user_id', '=', 'users.id')
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.tw', 0)
-            ->orderBy('user_word.word_id', 'ASC')
+            ->orderBy('user_word.word_id', 'DESC')
             ->select('word.name', 'word.type', 'user_word.*', 'word.id', 'word.translate')
             ->limit(6)
             ->get();
@@ -50,7 +50,7 @@ class LearningController extends Controller
             ->leftJoin('user_word', 'user_word.user_id', '=', 'users.id')
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.wt', 0)
-            ->orderBy('user_word.word_id', 'ASC')
+            ->orderBy('user_word.word_id', 'DESC')
             ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type')
             ->limit(6)
             ->get();
@@ -74,7 +74,7 @@ class LearningController extends Controller
             ->leftJoin('user_word', 'user_word.user_id', '=', 'users.id')
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.audio_test', 0)
-            ->orderBy('user_word.word_id', 'ASC')
+            ->orderBy('user_word.word_id', 'DESC')
             ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type')
             ->limit(6)
             ->get();

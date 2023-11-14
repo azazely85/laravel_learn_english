@@ -25,7 +25,7 @@ class LearningController extends Controller
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.tw', 0)
             ->orderBy('user_word.word_id', 'ASC')
-            ->select('word.name', 'word.type','user_word.*', 'word.id', 'word.translate')
+            ->select('word.name', 'word.type', 'user_word.*', 'word.id', 'word.translate')
             ->limit(6)
             ->get();
         foreach ($words as &$word) {

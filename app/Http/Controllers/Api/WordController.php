@@ -103,7 +103,7 @@ class WordController extends Controller
                 );
                 $baseService->saveMp3($name);
             }
-            $element->setAttribute('data-src-mp3', 'http://laravel.local/api/world/voice/' . $name . '_mp3');
+            $element->setAttribute('data-src-mp3', 'https://api.vidshup.pp.ua/api/world/voice/' . $name . '_mp3');
             $element->setAttribute('data-src-ogg', 'none');
         }
 

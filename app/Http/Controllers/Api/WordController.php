@@ -40,12 +40,16 @@ class WordController extends Controller
                 $word = UserWord::where('user_id', 1)
                     ->where('word_id', $checkWord->id)->first();
             }
-            $word->update(['audio_test' => 0,
-                'tw' => 0, 'wt' => 1]);
+            $word->update([
+                'audio_test' => 0,
+                'tw' => 0,
+                'wt' => 1
+            ]);
             dd($checkWord->translate);
         }
         $vebForms = '';
-        $baseService = new BaseService('https://www.oxfordlearnersdictionaries.com/search/english/?q=',
+        $baseService = new BaseService(
+            'https://www.oxfordlearnersdictionaries.com/search/english/?q=',
             [], false, 'oxford'
         );
         $result = $baseService->getContents($request->get('name'));
@@ -211,8 +215,13 @@ class WordController extends Controller
 
                 $vebFormsData = $this->getElementsByClass($clearData2, 'td', 'verb_form');
 
-                $replacement = array("present simple I / you / we / they ", "he / she / it ", "past simple ",
-                    "past participle ", "-ing form ");
+                $replacement = array(
+                    "present simple I / you / we / they ",
+                    "he / she / it ",
+                    "past simple ",
+                    "past participle ",
+                    "-ing form "
+                );
                 $i = 0;
 
                 if (count($vebFormsData) == 5) {
@@ -262,8 +271,6 @@ class WordController extends Controller
                         $vebForms .= trim(str_replace($replacement, "", $vebForm->nodeValue)) . ', ';
                     }
                 }
-
-
             }
         }
 
@@ -286,8 +293,16 @@ class WordController extends Controller
             if (!$check && !$checkWord) {
                 WordToParse::create(['url' => $element->getAttribute('href'), 'name' => $element->nodeValue]);
             }
-            $element->setAttribute('href', '/word/' . mb_strtolower(preg_replace('/\s+/', '_',
-                    $element->nodeValue)));
+            $element->setAttribute(
+                'href',
+                '/word/' . mb_strtolower(
+                    preg_replace(
+                        '/\s+/',
+                        '_',
+                        $element->nodeValue
+                    )
+                )
+            );
         }
         $data = $this->getElementsByClass($clearData, 'span', 'xr-g');
         foreach ($data as $element) {
@@ -315,7 +330,7 @@ class WordController extends Controller
         }
 
         $clearDataRing = $dom->getElementById('ring-links-box');
-        if($clearDataRing) {
+        if ($clearDataRing) {
             $clearDataRing->parentNode->removeChild($clearDataRing);
         }
         $data = $dom->saveXML($clearData);
@@ -351,29 +366,30 @@ class WordController extends Controller
         }
 
         if (!$translate) {
-            $baseService = new BaseService('https://dict.com/%D0%B0%D0%BD%D0%B3%D0%BB%D1%96%D0%B8%D1%81%D1%8C%D0%BA%D0%BE-%D1%83%D0%BA%D1%80%D0%B0%D1%96%D0%BD%D1%81%D1%8C%D0%BA%D0%B8%D0%B8/',
+            $baseService = new BaseService(
+                'https://dict.com/%D0%B0%D0%BD%D0%B3%D0%BB%D1%96%D0%B8%D1%81%D1%8C%D0%BA%D0%BE-%D1%83%D0%BA%D1%80%D0%B0%D1%96%D0%BD%D1%81%D1%8C%D0%BA%D0%B8%D0%B8/',
                 [],
                 false,
                 'dict'
             );
             $result = $baseService->getContents($wordName);
-            libxml_use_internal_errors(true);
-            $domUa = new \DOMDocument();
-            $domUa->loadHTML($result);
-            $clearDataUa = $domUa->getElementById('entry-wrapper');
-            $dataUa = $this->getElementsByClass($clearDataUa, 'span', 'lex_ful_tran');
-            foreach ($dataUa as $element) {
-                $translate .= $element->nodeValue . ', ';
-            }
-            if (!$translate) {
-                $dataUa = $this->getElementsByClass($clearDataUa, 'span', 'lex_ful_coll2t');
+            if ($result) {
+                libxml_use_internal_errors(true);
+                $domUa = new \DOMDocument();
+                $domUa->loadHTML($result);
+                $clearDataUa = $domUa->getElementById('entry-wrapper');
+                $dataUa = $this->getElementsByClass($clearDataUa, 'span', 'lex_ful_tran');
                 foreach ($dataUa as $element) {
                     $translate .= $element->nodeValue . ', ';
                 }
+                if (!$translate) {
+                    $dataUa = $this->getElementsByClass($clearDataUa, 'span', 'lex_ful_coll2t');
+                    foreach ($dataUa as $element) {
+                        $translate .= $element->nodeValue . ', ';
+                    }
+                }
             }
         }
-
-
         $translate = mb_substr($translate, 0, mb_strlen($translate) - 2);
         if (mb_strlen($translate) > 500) {
             $translate = mb_substr($translate, 0, mb_strlen($translate) - (mb_strlen($translate) - 499));
@@ -386,10 +402,23 @@ class WordController extends Controller
         }
         $user = User::find(2);
         if ($wordName) {
-            $word = Word::create(['name' => $wordName, 'type' => $wordType, 'description' => $data,
-                'veb_forms' => $vebForms, 'translate' => $translate, 'comparative' => $comparative,
-                'superlative' => $superlative, 'prsi' => $prsi, 'prsh' => $prsh, 'pas' => $pas, 'pas2' => $pas2,
-                'pasp' => $pasp, 'pasp2' => $pasp2, 'ing' => $ing, 'plural' => $plural]);
+            $word = Word::create([
+                'name' => $wordName,
+                'type' => $wordType,
+                'description' => $data,
+                'veb_forms' => $vebForms,
+                'translate' => $translate,
+                'comparative' => $comparative,
+                'superlative' => $superlative,
+                'prsi' => $prsi,
+                'prsh' => $prsh,
+                'pas' => $pas,
+                'pas2' => $pas2,
+                'pasp' => $pasp,
+                'pasp2' => $pasp2,
+                'ing' => $ing,
+                'plural' => $plural
+            ]);
 
             $user->words()->attach($word->id);
         }
@@ -397,7 +426,6 @@ class WordController extends Controller
         $user = auth()->user();
         $user->words()->attach($word->id);
         return response()->json(['status' => 'success', 'data' => $user], 200);
-
     }
 
     public function getUserWords(Request $request): JsonResponse

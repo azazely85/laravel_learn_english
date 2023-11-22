@@ -3,6 +3,7 @@
 namespace App\MyClasses;
 
 use Carbon\Carbon;
+use Exception;
 use GuzzleHttp;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,7 @@ class BaseService
     private $baseUrl;
     private $source;
     private $rateFileName;
-    const RATE_LIMIT_REQUESTS_COUNT = 100;
+    public const RATE_LIMIT_REQUESTS_COUNT = 100;
 
     public function __construct($baseUrl, $headers, $withRateLimit, $source, $withHeaders = true)
     {
@@ -71,12 +72,15 @@ class BaseService
     }
 
     public function getContents($apiEndpoint) {
-        if ($this->withRateLimit) {
-            $this->checkRateLimit();
+        try {
+            if ($this->withRateLimit) {
+                $this->checkRateLimit();
+            }
+            $result = $this->client->request('GET', $this->baseUrl . $apiEndpoint, $this->headers);
+            return $result->getBody()->getContents();
+        } catch (GuzzleHttp\Exception\GuzzleException $e) {
+            return null;
         }
-
-        $result = $this->client->request('GET', $this->baseUrl . $apiEndpoint, $this->headers);
-        return $result->getBody()->getContents();
     }
 
     public function get($apiEndpoint) {

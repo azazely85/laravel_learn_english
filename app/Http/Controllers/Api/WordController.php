@@ -361,8 +361,6 @@ class WordController extends Controller
             $domUa = new \DOMDocument();
             $domUa->loadHTML($result);
             $clearDataUa = $domUa->getElementById('entry-wrapper');
-
-
             $dataUa = $this->getElementsByClass($clearDataUa, 'span', 'lex_ful_tran');
             foreach ($dataUa as $element) {
                 $translate .= $element->nodeValue . ', ';

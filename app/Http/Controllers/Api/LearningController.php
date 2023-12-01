@@ -25,7 +25,8 @@ class LearningController extends Controller
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.tw', 0)
             ->orderBy('user_word.word_id', 'DESC')
-            ->select('word.name', 'word.type', 'user_word.*', 'word.id', 'word.translate')
+            ->select('word.name', 'word.type', 'user_word.*', 'word.id', 'word.translate', 'word.prsi',
+                'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
             ->limit(6)
             ->get();
         foreach ($words as &$word) {
@@ -51,7 +52,8 @@ class LearningController extends Controller
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.wt', 0)
             ->orderBy('user_word.word_id', 'DESC')
-            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type')
+            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type',
+                'word.prsi', 'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
             ->limit(6)
             ->get();
         foreach ($words as &$word) {
@@ -75,7 +77,8 @@ class LearningController extends Controller
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.audio_test', 0)
             ->orderBy('user_word.word_id', 'DESC')
-            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type')
+            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type',
+                'word.prsi', 'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
             ->limit(6)
             ->get();
 
@@ -208,7 +211,8 @@ class LearningController extends Controller
             ->where('wt', 1)
             ->where('audio_test', 1)
             ->where('start_repeat', '<', $from)
-            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type')
+            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type',
+                'word.prsi', 'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
             ->limit(6)
             ->get();
         foreach ($words as &$word) {

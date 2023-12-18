@@ -422,6 +422,11 @@ class WordController extends Controller
 
             $user->words()->attach($word->id);
         }
+        $pieces = explode(" ", $wordName);
+        if (count($pieces) > 1) {
+            UserWord::where('word_id', $word->id)->update(['audio_test' => 1]);
+        }
+
         dd(1);
         $user = auth()->user();
         $user->words()->attach($word->id);

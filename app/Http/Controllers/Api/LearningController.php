@@ -25,8 +25,21 @@ class LearningController extends Controller
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.tw', 0)
             ->orderBy('user_word.word_id', 'DESC')
-            ->select('word.name', 'word.type', 'user_word.*', 'word.id', 'word.translate', 'word.prsi',
-                'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
+            ->select(
+                'word.name',
+                'word.type',
+                'user_word.*',
+                'word.id',
+                'word.translate',
+                'word.prsi',
+                'word.prsh',
+                'word.pas',
+                'word.pas2',
+                'word.pasp',
+                'word.pasp2',
+                'word.ing',
+                'word.plural'
+            )
             ->limit(6)
             ->get();
         foreach ($words as &$word) {
@@ -52,8 +65,22 @@ class LearningController extends Controller
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.wt', 0)
             ->orderBy('user_word.word_id', 'DESC')
-            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type',
-                'word.prsi', 'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
+            ->select(
+                'word.name',
+                'user_word.*',
+                'word.id',
+                'word.translate',
+                'word.description',
+                'word.type',
+                'word.prsi',
+                'word.prsh',
+                'word.pas',
+                'word.pas2',
+                'word.pasp',
+                'word.pasp2',
+                'word.ing',
+                'word.plural'
+            )
             ->limit(6)
             ->get();
         foreach ($words as &$word) {
@@ -77,8 +104,22 @@ class LearningController extends Controller
             ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
             ->where('user_word.audio_test', 0)
             ->orderBy('user_word.word_id', 'DESC')
-            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type',
-                'word.prsi', 'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
+            ->select(
+                'word.name',
+                'user_word.*',
+                'word.id',
+                'word.translate',
+                'word.description',
+                'word.type',
+                'word.prsi',
+                'word.prsh',
+                'word.pas',
+                'word.pas2',
+                'word.pasp',
+                'word.pasp2',
+                'word.ing',
+                'word.plural'
+            )
             ->limit(6)
             ->get();
 
@@ -130,6 +171,7 @@ class LearningController extends Controller
         $authUser = Auth::id();
         $word = UserWord::where('user_id', $authUser)
             ->where('word_id', $request->get('id'))->first();
+        $pieces = explode(" ", $word->name);
         if ($request->get('check') == 'true') {
             $word->update([
                 'count_repeat' => $word->count_repeat + 1,
@@ -147,7 +189,7 @@ class LearningController extends Controller
             ]);
         } else {
             $word->update([
-                'audio_test' => 0,
+                'audio_test' => count($pieces) > 1 ? 1 : 0,
                 'tw' => 0,
                 'wt' => 0
             ]);
@@ -211,8 +253,22 @@ class LearningController extends Controller
             ->where('wt', 1)
             ->where('audio_test', 1)
             ->where('start_repeat', '<', $from)
-            ->select('word.name', 'user_word.*', 'word.id', 'word.translate', 'word.description', 'word.type',
-                'word.prsi', 'word.prsh', 'word.pas', 'word.pas2', 'word.pasp', 'word.pasp2', 'word.ing', 'word.plural')
+            ->select(
+                'word.name',
+                'user_word.*',
+                'word.id',
+                'word.translate',
+                'word.description',
+                'word.type',
+                'word.prsi',
+                'word.prsh',
+                'word.pas',
+                'word.pas2',
+                'word.pasp',
+                'word.pasp2',
+                'word.ing',
+                'word.plural'
+            )
             ->limit(6)
             ->get();
         foreach ($words as &$word) {

@@ -40,8 +40,9 @@ class WordController extends Controller
                 $word = UserWord::where('user_id', 1)
                     ->where('word_id', $checkWord->id)->first();
             }
+            $pieces = explode(" ", $word->name);
             $word->update([
-                'audio_test' => 0,
+                'audio_test' => count($pieces) > 1 ? 1 : 0,
                 'tw' => 0,
                 'wt' => 1
             ]);

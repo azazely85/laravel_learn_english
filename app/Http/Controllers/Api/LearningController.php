@@ -161,8 +161,11 @@ class LearningController extends Controller
     public function changeStatusId(Request $request): JsonResponse
     {
         $authUser = Auth::id();
+        $word = Word::where('id', $request->get('id'))->first();
+        $pieces = explode(" ", $word->name);
         UserWord::where('user_id', $authUser)
-            ->where('word_id', $request->get('id'))->update(['wt' => 0, 'tw' => 0, 'audio_test' => 0]);
+            ->where('word_id', $request->get('id'))->update(['wt' => 0, 'tw' => 0,
+                'audio_test' => count($pieces) > 1 ? 1 : 0,]);
         return response()->json(['status' => 'success', 'data' => 'nice'], 200);
     }
 

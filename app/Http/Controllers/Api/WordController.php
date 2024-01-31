@@ -21,33 +21,6 @@ class WordController extends Controller
      */
     public function getWord(Request $request): JsonResponse
     {
-        $checkWord = Word::where('name', $request->get('name'))
-            ->orWhere('prsi', $request->get('name'))
-            ->orWhere('prsh', $request->get('name'))
-            ->orWhere('plural', $request->get('name'))
-            ->orWhere('pas', $request->get('name'))
-            ->orWhere('pasp', $request->get('name'))
-            ->orWhere('ing', $request->get('name'))
-            ->orWhere('comparative', $request->get('name'))
-            ->orWhere('superlative', $request->get('name'))
-            ->first();
-        if ($checkWord) {
-            $user = User::find(2);
-            $word = UserWord::where('user_id', 2)
-                ->where('word_id', $checkWord->id)->first();
-            if (!$word) {
-                $user->words()->attach($checkWord->id);
-                $word = UserWord::where('user_id', 1)
-                    ->where('word_id', $checkWord->id)->first();
-            }
-            $pieces = explode(" ", $word->name);
-            $word->update([
-                'audio_test' => count($pieces) > 1 ? 1 : 0,
-                'tw' => 0,
-                'wt' => 1
-            ]);
-            dd($checkWord->translate);
-        }
         $vebForms = '';
         $baseService = new BaseService(
             'https://www.oxfordlearnersdictionaries.com/search/english/?q=',

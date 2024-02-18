@@ -63,8 +63,9 @@ class WordController extends Controller
             UserWord::where('user_id', 1)
                 ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
                     'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
-            var_dump($checkWord->translate);
-            dd($checkWord->description);
+            echo $checkWord->translate . '<br />';
+            echo $checkWord->description;
+            dd(1);
         }
         $data = $this->getElementsByClass($clearData, 'div', 'parallax-container');
         foreach ($data as $element) {

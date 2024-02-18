@@ -57,7 +57,12 @@ class WordController extends Controller
             if ($wordName != $request->get('name')) {
                 $checkWord->update(['plural' => $request->get('name')]);
             }
-            dd($checkWord);
+            $pieces = explode(" ", $checkWord->name);
+            UserWord::where('user_id', 1)
+                ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
+                    'audio_test' => count($pieces) > 1 ? 1 : 0,]);
+            var_dump($checkWord->translate);
+            dd($checkWord->description);
         }
         $data = $this->getElementsByClass($clearData, 'div', 'parallax-container');
         foreach ($data as $element) {

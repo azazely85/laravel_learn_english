@@ -60,7 +60,7 @@ class WordController extends Controller
             }
             $pieces = explode(" ", $checkWord->name);
             $date = Carbon::now();
-            UserWord::where('user_id', 1)
+            UserWord::where('user_id', 2)
                 ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
                     'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
             echo $checkWord->translate . '<br />';

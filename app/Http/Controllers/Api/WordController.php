@@ -8,6 +8,7 @@ use App\Models\UserWord;
 use App\Models\Word;
 use App\Models\WordToParse;
 use App\MyClasses\BaseService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,9 +59,10 @@ class WordController extends Controller
                 $checkWord->update(['plural' => $request->get('name')]);
             }
             $pieces = explode(" ", $checkWord->name);
+            $date = Carbon::now();
             UserWord::where('user_id', 1)
                 ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
-                    'audio_test' => count($pieces) > 1 ? 1 : 0,]);
+                    'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
             var_dump($checkWord->translate);
             dd($checkWord->description);
         }

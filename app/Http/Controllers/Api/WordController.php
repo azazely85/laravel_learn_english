@@ -23,17 +23,15 @@ class WordController extends Controller
     public function getWord(Request $request): JsonResponse
     {
         $vebForms = '';
-        $baseService = new BaseService(
-            'https://oxfordlearnersdictionaries.com/search/english/?q=',
-            [], false, 'oxford'
+        $baseService = file_get_contents(
+            'https://oxfordlearnersdictionaries.com/search/english/?q='. str_replace(' ', '+',$request->get('name')),
         );
-        $result = $baseService->getContents($request->get('name'));
 
         $wordName = '';
         $wordType = '';
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
-        $dom->loadHTML($result);
+        $dom->loadHTML($baseService);
         $clearData = $dom->getElementById('entryContent');
         $data = $this->getElementsByClass($clearData, 'h1', 'headword');
         $allowed = "/[^a-z\\040\\.\\-\/]/i";
@@ -54,19 +52,19 @@ class WordController extends Controller
             ->orWhere('comparative', $wordName)
             ->orWhere('superlative', $wordName)
             ->first();
-        if ($checkWord && $checkWord->type == $wordType) {
-            if ($wordName != $request->get('name')) {
-                $checkWord->update(['plural' => $request->get('name')]);
-            }
-            $pieces = explode(" ", $checkWord->name);
-            $date = Carbon::now();
-            UserWord::where('user_id', 2)
-                ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
-                    'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
-            echo $checkWord->translate . '<br />';
-            echo $checkWord->description;
-            dd(1);
-        }
+//        if ($checkWord && $checkWord->type == $wordType) {
+//            if ($wordName != $request->get('name')) {
+//                $checkWord->update(['plural' => $request->get('name')]);
+//            }
+//            $pieces = explode(" ", $checkWord->name);
+//            $date = Carbon::now();
+//            UserWord::where('user_id', 2)
+//                ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
+//                    'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
+//            echo $checkWord->translate . '<br />';
+//            echo $checkWord->description;
+//            dd(1);
+//        }
         $data = $this->getElementsByClass($clearData, 'div', 'parallax-container');
         foreach ($data as $element) {
             $element->parentNode->removeChild($element);

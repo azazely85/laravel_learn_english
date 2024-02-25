@@ -79,7 +79,7 @@ class BaseService
             $result = $this->client->request('GET', $this->baseUrl . $apiEndpoint, $this->headers);
             return $result->getBody()->getContents();
         } catch (GuzzleHttp\Exception\GuzzleException $e) {
-            dd($e->getMessage());
+            dd($this->baseUrl);
         }
     }
 

@@ -77,9 +77,10 @@ class BaseService
                 $this->checkRateLimit();
             }
             $result = $this->client->request('GET', $this->baseUrl . $apiEndpoint, $this->headers);
+            dd($result);
             return $result->getBody()->getContents();
         } catch (GuzzleHttp\Exception\GuzzleException $e) {
-            dd($this->baseUrl);
+            dd($e->getCode(), $e->getMessage());
         }
     }
 

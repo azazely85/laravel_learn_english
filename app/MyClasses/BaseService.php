@@ -94,7 +94,7 @@ class BaseService
 
     public function saveMp3($name) {
         $content = file_get_contents($this->baseUrl);
-        Storage::put('app/2/'.$name.'.mp3', $content);
+        Storage::put('app/'.$name.'.mp3', $content);
 //        $result = $this->client->request('GET', $this->baseUrl, ['sink' => storage_path('app/'.$name.'.mp3')]);
 //        return json_decode($result->getBody(), true);
             return true;

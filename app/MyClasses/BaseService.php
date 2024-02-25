@@ -79,7 +79,7 @@ class BaseService
             $result = $this->client->request('GET', $this->baseUrl . $apiEndpoint, $this->headers);
             return $result->getBody()->getContents();
         } catch (GuzzleHttp\Exception\GuzzleException $e) {
-            dd($this->baseUrl);
+            dd($e->getMessage());
         }
     }
 
@@ -93,9 +93,11 @@ class BaseService
     }
 
     public function saveMp3($name) {
-
-        $result = $this->client->request('GET', $this->baseUrl, ['sink' => storage_path('app/'.$name.'.mp3')]);
-        return json_decode($result->getBody(), true);
+        $content = file_get_contents($this->baseUrl);
+        Storage::put('app/2/'.$name.'.mp3', $content);
+//        $result = $this->client->request('GET', $this->baseUrl, ['sink' => storage_path('app/'.$name.'.mp3')]);
+//        return json_decode($result->getBody(), true);
+            return true;
     }
 
     public function post($apiEndpoint, $postData = [], $useCustomHeaders = true) {

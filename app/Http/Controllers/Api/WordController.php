@@ -24,7 +24,7 @@ class WordController extends Controller
     {
         $vebForms = '';
         $baseService = new BaseService(
-            'https://www.oxfordlearnersdictionaries.com/search/english/?q=',
+            'https://oxfordlearnersdictionaries.com/search/english/?q=',
             [], false, 'oxford'
         );
         $result = $baseService->getContents($request->get('name'));

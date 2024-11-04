@@ -272,6 +272,7 @@ class LearningController extends Controller
                 'word.ing',
                 'word.plural'
             )
+            ->inRandomOrder()
             ->limit(6)
             ->get();
         foreach ($words as &$word) {

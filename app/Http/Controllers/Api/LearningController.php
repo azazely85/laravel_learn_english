@@ -180,16 +180,16 @@ class LearningController extends Controller
                 'count_repeat' => $word->count_repeat + 1,
                 'start_repeat' => Carbon::now()->addDays(($word->count_repeat + 1) * 2)
             ]);
-        } elseif ($word->count_repeat - 1 > 0) {
-            $word->update([
-                'count_repeat' => $word->count_repeat - 1,
-                'start_repeat' => Carbon::now()->addDays(round($word->count_repeat / 2, 0) - 1)
-            ]);
-        } elseif ($word->count_repeat == 1) {
-            $word->update([
-                'count_repeat' => 0,
-                'start_repeat' => Carbon::now()->addDays(1)
-            ]);
+//        } elseif ($word->count_repeat - 1 > 0) {
+//            $word->update([
+//                'count_repeat' => $word->count_repeat - 1,
+//                'start_repeat' => Carbon::now()->addDays(round($word->count_repeat / 2, 0) - 1)
+//            ]);
+//        } elseif ($word->count_repeat == 1) {
+//            $word->update([
+//                'count_repeat' => 0,
+//                'start_repeat' => Carbon::now()->addDays(1)
+//            ]);
         } else {
             $word->update([
                 'audio_test' => count($pieces) > 1 ? 1 : 0,

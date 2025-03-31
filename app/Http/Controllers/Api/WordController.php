@@ -316,34 +316,34 @@ class WordController extends Controller
         $data = $dom->saveXML($clearData);
         $translate = '';
 
-        if (!$translate) {
-            $baseService = new BaseService('https://e2u.org.ua/s?w=', [], false, 'dict');
-            $result = $baseService->getContents($wordName . '&dicts=all');
-            libxml_use_internal_errors(true);
-            $domUa = new \DOMDocument();
-            $domUa->loadHTML($result);
-            $clearDataUa = $domUa->getElementById('table_17');
-            if (!$clearDataUa) {
-                $clearDataUa = $domUa->getElementById('table_2');
-            }
-            if (!$clearDataUa) {
-                $clearDataUa = $domUa->getElementById('table_1');
-            }
-            if (!$clearDataUa) {
-                $clearDataUa = $domUa->getElementById('table_18');
-            }
-
-            if ($clearDataUa) {
-                $dataUa = $this->getElementsByClass($clearDataUa, 'td', 'result_row_main');
-                foreach ($dataUa as $element) {
-                    $translate .= $element->nodeValue . ', ';
-                }
-                $translate = stristr($translate, '1');
-                $pos = strpos($translate, '2');
-                $translate = substr($translate, 0, $pos);
-                $translate = mb_substr($translate, 2, mb_strlen($translate));
-            }
-        }
+//        if (!$translate) {
+//            $baseService = new BaseService('https://e2u.org.ua/s?w=', [], false, 'dict');
+//            $result = $baseService->getContents($wordName . '&dicts=all');
+//            libxml_use_internal_errors(true);
+//            $domUa = new \DOMDocument();
+//            $domUa->loadHTML($result);
+//            $clearDataUa = $domUa->getElementById('table_17');
+//            if (!$clearDataUa) {
+//                $clearDataUa = $domUa->getElementById('table_2');
+//            }
+//            if (!$clearDataUa) {
+//                $clearDataUa = $domUa->getElementById('table_1');
+//            }
+//            if (!$clearDataUa) {
+//                $clearDataUa = $domUa->getElementById('table_18');
+//            }
+//
+//            if ($clearDataUa) {
+//                $dataUa = $this->getElementsByClass($clearDataUa, 'td', 'result_row_main');
+//                foreach ($dataUa as $element) {
+//                    $translate .= $element->nodeValue . ', ';
+//                }
+//                $translate = stristr($translate, '1');
+//                $pos = strpos($translate, '2');
+//                $translate = substr($translate, 0, $pos);
+//                $translate = mb_substr($translate, 2, mb_strlen($translate));
+//            }
+//        }
 
         if (!$translate) {
             $baseService = new BaseService(

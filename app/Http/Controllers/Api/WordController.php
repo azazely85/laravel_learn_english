@@ -67,7 +67,8 @@ class WordController extends Controller
             $pieces2 = explode(" ", $checkWord2->name);
             $date = Carbon::now();
             if (count($pieces) != count($pieces2)) {
-                $userWord = UserWord::where('user_id', 2)->where('word_id', $checkWord->id)->first();
+                $userWord = UserWord::where('user_id', 2)
+                    ->where('word_id', $checkWord2->id)->first();
                 if (!$userWord) {
                     UserWord::create([
                         'user_id' => 2,

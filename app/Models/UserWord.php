@@ -49,7 +49,8 @@ class UserWord extends Model
         'audio_test',
         'date',
         'start_repeat',
-        'count_repeat'
+        'count_repeat',
+        'user_id'
     ];
     protected $table = 'user_word';
     public $timestamps = false;

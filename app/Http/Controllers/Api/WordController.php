@@ -84,6 +84,7 @@ class WordController extends Controller
                         'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
                 echo $checkWord2->translate . '<br />';
                 echo $checkWord2->description;
+                dd(1);
             }
         }
 

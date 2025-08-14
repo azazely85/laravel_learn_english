@@ -50,7 +50,8 @@ class UserWord extends Model
         'date',
         'start_repeat',
         'count_repeat',
-        'user_id'
+        'user_id',
+        'word_id',
     ];
     protected $table = 'user_word';
     public $timestamps = false;

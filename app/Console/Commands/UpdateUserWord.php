@@ -34,7 +34,12 @@ class UpdateUserWord extends Command
         // Build query
         $userWords = UserWord::all();
         foreach ($userWords as $userWord) {
+            
             $word = Word::find($userWord->word_id);
+            if (!$word) {
+                $userWord->delete();
+                continue;
+            }
             $pieces = explode(" ", $word->name);
             if (count($pieces) > 1) {
                 $userWord->audio_test = 1;

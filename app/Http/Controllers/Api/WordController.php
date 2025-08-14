@@ -52,6 +52,27 @@ class WordController extends Controller
             ->orWhere('comparative', $wordName)
             ->orWhere('superlative', $wordName)
             ->first();
+        $pieces = explode(" ", $wordName);
+        $pieces2 = explode(" ", $checkWord->name);
+        $date = Carbon::now();
+        if (count($pieces) != count($pieces2)) {
+            $userWord = UserWord::where('user_id', 2)->where('word_id', $checkWord->id)->first();
+            if (!$userWord) {
+                UserWord::create([
+                    'user_id' => 2,
+                    'word_id' => $checkWord->id,
+                    'wt' => 0,
+                    'tw' => 0,
+                    'audio_test' => count($pieces) > 1 ? 1 : 0,
+                    'start_repeat' => $date
+                ]);
+            }
+            UserWord::where('user_id', 2)
+            ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
+                'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
+            echo $checkWord->translate . '<br />';
+            echo $checkWord->description;
+        }
         if ($checkWord && $checkWord->type == $wordType) {
             if ($wordName != $request->get('name')) {
                 $checkWord->update(['plural' => $request->get('name')]);

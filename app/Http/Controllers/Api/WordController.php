@@ -52,27 +52,40 @@ class WordController extends Controller
             ->orWhere('comparative', $wordName)
             ->orWhere('superlative', $wordName)
             ->first();
-        $pieces = explode(" ", $wordName);
-        $pieces2 = explode(" ", $checkWord->name);
-        $date = Carbon::now();
-        if (count($pieces) != count($pieces2)) {
-            $userWord = UserWord::where('user_id', 2)->where('word_id', $checkWord->id)->first();
-            if (!$userWord) {
-                UserWord::create([
-                    'user_id' => 2,
-                    'word_id' => $checkWord->id,
-                    'wt' => 0,
-                    'tw' => 0,
-                    'audio_test' => count($pieces) > 1 ? 1 : 0,
-                    'start_repeat' => $date
-                ]);
+        $checkWord2 = Word::where('name', $request->get('name'))
+            ->orWhere('prsi', $request->get('name'))
+            ->orWhere('plural', $request->get('name'))
+            ->orWhere('prsh', $request->get('name'))
+            ->orWhere('pas', $request->get('name'))
+            ->orWhere('pasp', $request->get('name'))
+            ->orWhere('ing', $request->get('name'))
+            ->orWhere('comparative', $request->get('name'))
+            ->orWhere('superlative', $request->get('name'))
+            ->first();
+        if ($checkWord2) {
+            $pieces = explode(" ", $wordName);
+            $pieces2 = explode(" ", $checkWord2->name);
+            $date = Carbon::now();
+            if (count($pieces) != count($pieces2)) {
+                $userWord = UserWord::where('user_id', 2)->where('word_id', $checkWord->id)->first();
+                if (!$userWord) {
+                    UserWord::create([
+                        'user_id' => 2,
+                        'word_id' => $checkWord2->id,
+                        'wt' => 0,
+                        'tw' => 0,
+                        'audio_test' => count($pieces) > 1 ? 1 : 0,
+                        'start_repeat' => $date
+                    ]);
+                }
+                UserWord::where('user_id', 2)
+                    ->where('word_id', $checkWord2->id)->update(['wt' => 0, 'tw' => 0,
+                        'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
+                echo $checkWord2->translate . '<br />';
+                echo $checkWord2->description;
             }
-            UserWord::where('user_id', 2)
-            ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
-                'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
-            echo $checkWord->translate . '<br />';
-            echo $checkWord->description;
         }
+
         if ($checkWord && $checkWord->type == $wordType) {
             if ($wordName != $request->get('name')) {
                 $checkWord->update(['plural' => $request->get('name')]);

@@ -375,7 +375,8 @@ class WordController extends Controller
         $translate = mb_substr($translate, 0, mb_strlen($translate) - 2);
         if (mb_strlen($translate) > 500) {
             $translate = mb_substr($translate, 0, mb_strlen($translate) - (mb_strlen($translate) - 499));
-        } else {
+        }
+        if (!$translate) {
             $client = new GuzzleHttp\Client();
             $subscriptionKey = config('app.translator_key');
             if (empty($subscriptionKey)) {
@@ -405,11 +406,7 @@ class WordController extends Controller
             $translate2 = mb_substr($translate2, 0, mb_strlen($translate2) - 2);
 
             // Ensure translate2 is included in translate (append with comma if missing)
-            $translate = trim($translate);
-            $translate2 = trim($translate2);
-            if ($translate2 !== '' && mb_stripos($translate, $translate2) === false) {
-                $translate = $translate !== '' ? $translate . ', ' . $translate2 : $translate2;
-            }
+            $translate = trim($translate2);
         }
         echo $translate;
         echo $data;

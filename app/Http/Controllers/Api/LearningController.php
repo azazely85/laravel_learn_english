@@ -40,13 +40,17 @@ class LearningController extends Controller
                 'word.pasp',
                 'word.pasp2',
                 'word.ing',
-                'word.plural'
+                'word.plural',
             )
             ->limit(6)
             ->get();
         foreach ($words as &$word) {
-            $toTranslate = Word::select('name')->where('type', $word->type)
-                ->limit(5)->inRandomOrder()->pluck('name')->toArray();
+            $toTranslate = Word::select('name')
+                ->where('type', $word->type)
+                ->limit(5)
+                ->inRandomOrder()
+                ->pluck('name')
+                ->toArray();
             if (!in_array($word->name, $toTranslate)) {
                 $toTranslate[] = $word->name;
             }
@@ -81,13 +85,17 @@ class LearningController extends Controller
                 'word.pasp',
                 'word.pasp2',
                 'word.ing',
-                'word.plural'
+                'word.plural',
             )
             ->limit(6)
             ->get();
         foreach ($words as &$word) {
-            $toTranslate = Word::select('translate')->where('type', $word->type)->limit(5)
-                ->inRandomOrder()->pluck('translate')->toArray();
+            $toTranslate = Word::select('translate')
+                ->where('type', $word->type)
+                ->limit(5)
+                ->inRandomOrder()
+                ->pluck('translate')
+                ->toArray();
             if (!in_array($word->translate, $toTranslate)) {
                 $toTranslate[] = $word->translate;
             }
@@ -120,7 +128,7 @@ class LearningController extends Controller
                 'word.pasp',
                 'word.pasp2',
                 'word.ing',
-                'word.plural'
+                'word.plural',
             )
             ->limit(6)
             ->get();
@@ -131,7 +139,7 @@ class LearningController extends Controller
             foreach ($spells as $spell) {
                 $spellNames[] = [
                     'character' => $spell,
-                    'show' => false
+                    'show' => false,
                 ];
             }
             $word->spell = $spellNames;
@@ -142,8 +150,7 @@ class LearningController extends Controller
     public function changeStatus(Request $request): JsonResponse
     {
         $authUser = Auth::id();
-        $word = UserWord::where('user_id', $authUser)
-            ->where('word_id', $request->get('id'))->first();
+        $word = UserWord::where('user_id', $authUser)->where('word_id', $request->get('id'))->first();
         if ($request->get('check') == 'wt') {
             $word->update(['wt' => 1]);
         }
@@ -164,29 +171,28 @@ class LearningController extends Controller
     {
         $authUser = Auth::id();
         $word = Word::where('id', $request->get('id'))->first();
-        $pieces = explode(" ", $word->name);
+        $pieces = explode(' ', $word->name);
         UserWord::where('user_id', $authUser)
-            ->where('word_id', $request->get('id'))->update(['wt' => 0, 'tw' => 0,
-                'audio_test' => count($pieces) > 1 ? 1 : 0,]);
+            ->where('word_id', $request->get('id'))
+            ->update(['wt' => 0, 'tw' => 0, 'audio_test' => count($pieces) > 1 ? 1 : 0]);
         return response()->json(['status' => 'success', 'data' => 'nice'], 200);
     }
 
     public function changeRepeat(Request $request): JsonResponse
     {
         $authUser = Auth::id();
-        $word = UserWord::where('user_id', $authUser)
-            ->where('word_id', $request->get('id'))->first();
-        $pieces = explode(" ", $word->name);
+        $word = UserWord::where('user_id', $authUser)->where('word_id', $request->get('id'))->first();
+        $pieces = explode(' ', $word->name);
         if ($request->get('check') == 'true') {
             $word->update([
                 'count_repeat' => $word->count_repeat + 1,
-                'start_repeat' => Carbon::now()->addDays(($word->count_repeat + 1) * 2)
+                'start_repeat' => Carbon::now()->addDays(($word->count_repeat + 1) * 2),
             ]);
         } else {
             $word->update([
                 'audio_test' => count($pieces) > 1 ? 1 : 0,
                 'tw' => 0,
-                'wt' => 0
+                'wt' => 0,
             ]);
         }
         return response()->json(['status' => 'success', 'data' => 'nice'], 200);
@@ -203,20 +209,23 @@ class LearningController extends Controller
         $counts = UserWord::where('user_id', $authUser)
             ->selectRaw(
                 "SUM(CASE WHEN tw = 1 AND wt = 1 AND audio_test = 1 AND start_repeat < ? THEN 1 ELSE 0 END) as repeat_count,\n" .
-                "SUM(CASE WHEN audio_test = 0 THEN 1 ELSE 0 END) as audio_count,\n" .
-                "SUM(CASE WHEN wt = 0 THEN 1 ELSE 0 END) as wt_count,\n" .
-                "SUM(CASE WHEN tw = 0 THEN 1 ELSE 0 END) as tw_count",
-                [$from]
+                    "SUM(CASE WHEN audio_test = 0 THEN 1 ELSE 0 END) as audio_count,\n" .
+                    "SUM(CASE WHEN wt = 0 THEN 1 ELSE 0 END) as wt_count,\n" .
+                    'SUM(CASE WHEN tw = 0 THEN 1 ELSE 0 END) as tw_count',
+                [$from],
             )
             ->first();
 
-        return response()->json([
-            'status' => 'success',
-            'repeat' => (int) ($counts->repeat_count ?? 0),
-            'audio' => (int) ($counts->audio_count ?? 0),
-            'wt' => (int) ($counts->wt_count ?? 0),
-            'tw' => (int) ($counts->tw_count ?? 0)
-        ], 200);
+        return response()->json(
+            [
+                'status' => 'success',
+                'repeat' => (int) ($counts->repeat_count ?? 0),
+                'audio' => (int) ($counts->audio_count ?? 0),
+                'wt' => (int) ($counts->wt_count ?? 0),
+                'tw' => (int) ($counts->tw_count ?? 0),
+            ],
+            200,
+        );
     }
 
     /**
@@ -247,7 +256,7 @@ class LearningController extends Controller
                 'word.pasp',
                 'word.pasp2',
                 'word.ing',
-                'word.plural'
+                'word.plural',
             )
             ->inRandomOrder()
             ->limit(6)
@@ -272,7 +281,7 @@ class LearningController extends Controller
     public function translateWord(Request $request): JsonResponse
     {
         $request->validate([
-            'word' => 'required|string|min:1'
+            'word' => 'required|string|min:1',
         ]);
 
         $subscriptionKey = config('app.translator_key');
@@ -280,7 +289,7 @@ class LearningController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Translator key is not configured'], 500);
         }
 
-        $baseUrl = 'https://api.cognitive.microsofttranslator.com/translator';
+        $baseUrl = 'https://api.cognitive.microsofttranslator.com/translate';
 
         $headers = [
             'Ocp-Apim-Subscription-Key' => $subscriptionKey,
@@ -292,7 +301,7 @@ class LearningController extends Controller
         $query = [
             'api-version' => '3.0',
             'from' => 'en',
-            'to' => ['ua'],
+            'to' => 'uk',
         ];
 
         try {
@@ -300,27 +309,31 @@ class LearningController extends Controller
                 ->withOptions(['query' => $query])
                 ->post($baseUrl, [
                     [
-                        'text' => $request->get('word')
-                    ]
+                        'Text' => $request->get('word'),
+                    ],
                 ]);
-                $data = $response->json();
-                dd($data);
             if (!$response->ok()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Translation API error',
-                    'details' => $response->json()
-                ], $response->status());
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Translation API error',
+                        'details' => $response->json(),
+                    ],
+                    $response->status(),
+                );
             }
 
-            
+            $data = $response->json();
             return response()->json(['status' => 'success', 'data' => $data], 200);
         } catch (\Throwable $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to contact translation service',
-                'details' => $e->getMessage()
-            ], 500);
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Failed to contact translation service',
+                    'details' => $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
 }

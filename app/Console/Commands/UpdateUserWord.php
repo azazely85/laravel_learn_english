@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Word;
 use Carbon\Carbon;
 
+
 class UpdateUserWord extends Command
 {
     /**
@@ -29,6 +30,8 @@ class UpdateUserWord extends Command
      */
     public function handle()
     {
+        
+         
         $this->info('Starting UserWord update process...');
 
         // Build query

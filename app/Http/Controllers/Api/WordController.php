@@ -13,6 +13,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use GuzzleHttp;
 
 class WordController extends Controller
 {
@@ -24,7 +26,7 @@ class WordController extends Controller
     {
         $vebForms = '';
         $baseService = file_get_contents(
-            'https://oxfordlearnersdictionaries.com/search/english/?q='. str_replace(' ', '+',$request->get('name')),
+            'https://oxfordlearnersdictionaries.com/search/english/?q=' . str_replace(' ', '+', $request->get('name')),
         );
 
         $wordName = '';
@@ -36,7 +38,7 @@ class WordController extends Controller
         $data = $this->getElementsByClass($clearData, 'h1', 'headword');
         $allowed = "/[^a-z\\040\\.\\-\/]/i";
         foreach ($data as $element) {
-            $wordName = preg_replace($allowed, "", trim($element->nodeValue));
+            $wordName = preg_replace($allowed, '', trim($element->nodeValue));
         }
         $data = $this->getElementsByClass($clearData, 'span', 'pos');
         foreach ($data as $element) {
@@ -63,12 +65,11 @@ class WordController extends Controller
             ->orWhere('superlative', $request->get('name'))
             ->first();
         if ($checkWord2) {
-            $pieces = explode(" ", $wordName);
-            $pieces2 = explode(" ", $checkWord2->name);
+            $pieces = explode(' ', $wordName);
+            $pieces2 = explode(' ', $checkWord2->name);
             $date = Carbon::now();
             if (count($pieces) != count($pieces2)) {
-                $userWord = UserWord::where('user_id', 2)
-                    ->where('word_id', $checkWord2->id)->first();
+                $userWord = UserWord::where('user_id', 2)->where('word_id', $checkWord2->id)->first();
                 if (!$userWord) {
                     UserWord::create([
                         'user_id' => 2,
@@ -76,12 +77,17 @@ class WordController extends Controller
                         'wt' => 0,
                         'tw' => 0,
                         'audio_test' => count($pieces) > 1 ? 1 : 0,
-                        'start_repeat' => $date
+                        'start_repeat' => $date,
                     ]);
                 }
                 UserWord::where('user_id', 2)
-                    ->where('word_id', $checkWord2->id)->update(['wt' => 0, 'tw' => 0,
-                        'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
+                    ->where('word_id', $checkWord2->id)
+                    ->update([
+                        'wt' => 0,
+                        'tw' => 0,
+                        'audio_test' => count($pieces) > 1 ? 1 : 0,
+                        'start_repeat' => $date,
+                    ]);
                 echo $checkWord2->translate . '<br />';
                 echo $checkWord2->description;
                 dd(1);
@@ -92,11 +98,11 @@ class WordController extends Controller
             if ($wordName != $request->get('name')) {
                 $checkWord->update(['plural' => $request->get('name')]);
             }
-            $pieces = explode(" ", $checkWord->name);
+            $pieces = explode(' ', $checkWord->name);
             $date = Carbon::now();
             UserWord::where('user_id', 2)
-                ->where('word_id', $checkWord->id)->update(['wt' => 0, 'tw' => 0,
-                    'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
+                ->where('word_id', $checkWord->id)
+                ->update(['wt' => 0, 'tw' => 0, 'audio_test' => count($pieces) > 1 ? 1 : 0, 'start_repeat' => $date]);
             echo $checkWord->translate . '<br />';
             echo $checkWord->description;
             dd(1);
@@ -118,9 +124,7 @@ class WordController extends Controller
         foreach ($data as $element) {
             $name = mb_strtolower(preg_replace('/\s+/', '_', $element->getAttribute('title')));
             if (!Storage::disk('local')->exists($name . '.mp3')) {
-                $baseService = new BaseService($element->getAttribute('data-src-mp3'), [], false,
-                    'oxford'
-                );
+                $baseService = new BaseService($element->getAttribute('data-src-mp3'), [], false, 'oxford');
                 $baseService->saveMp3($name);
             }
             $element->setAttribute('data-src-mp3', 'https://api.vidshup.pp.ua/api/world/voice/' . $name . '_mp3');
@@ -231,60 +235,60 @@ class WordController extends Controller
 
                 $vebFormsData = $this->getElementsByClass($clearData2, 'td', 'verb_form');
 
-                $replacement = array(
-                    "present simple I / you / we / they ",
-                    "he / she / it ",
-                    "past simple ",
-                    "past participle ",
-                    "-ing form "
-                );
+                $replacement = [
+                    'present simple I / you / we / they ',
+                    'he / she / it ',
+                    'past simple ',
+                    'past participle ',
+                    '-ing form ',
+                ];
                 $i = 0;
 
                 if (count($vebFormsData) == 5) {
                     foreach ($vebFormsData as $vebForm) {
                         if ($i == 0) {
-                            $prsi = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $prsi = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 1) {
-                            $prsh = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $prsh = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 2) {
-                            $pas = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $pas = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 3) {
-                            $pasp = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $pasp = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 4) {
-                            $ing = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $ing = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         $i++;
-                        $vebForms .= trim(str_replace($replacement, "", $vebForm->nodeValue)) . ', ';
+                        $vebForms .= trim(str_replace($replacement, '', $vebForm->nodeValue)) . ', ';
                     }
                 } else {
                     foreach ($vebFormsData as $vebForm) {
                         if ($i == 0) {
-                            $prsi = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $prsi = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 1) {
-                            $prsh = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $prsh = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 2) {
-                            $pas = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $pas = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 3) {
-                            $pasp = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $pasp = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 4) {
-                            $pas2 = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $pas2 = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 5) {
-                            $pasp2 = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $pasp2 = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         if ($i == 6) {
-                            $ing = trim(str_replace($replacement, "", $vebForm->nodeValue));
+                            $ing = trim(str_replace($replacement, '', $vebForm->nodeValue));
                         }
                         $i++;
-                        $vebForms .= trim(str_replace($replacement, "", $vebForm->nodeValue)) . ', ';
+                        $vebForms .= trim(str_replace($replacement, '', $vebForm->nodeValue)) . ', ';
                     }
                 }
             }
@@ -309,16 +313,7 @@ class WordController extends Controller
             if (!$check && !$checkWord) {
                 WordToParse::create(['url' => $element->getAttribute('href'), 'name' => $element->nodeValue]);
             }
-            $element->setAttribute(
-                'href',
-                '/word/' . mb_strtolower(
-                    preg_replace(
-                        '/\s+/',
-                        '_',
-                        $element->nodeValue
-                    )
-                )
-            );
+            $element->setAttribute('href', '/word/' . mb_strtolower(preg_replace('/\s+/', '_', $element->nodeValue)));
         }
         $data = $this->getElementsByClass($clearData, 'span', 'xr-g');
         foreach ($data as $element) {
@@ -352,41 +347,41 @@ class WordController extends Controller
         $data = $dom->saveXML($clearData);
         $translate = '';
 
-//        if (!$translate) {
-//            $baseService = new BaseService('https://e2u.org.ua/s?w=', [], false, 'dict');
-//            $result = $baseService->getContents($wordName . '&dicts=all');
-//            libxml_use_internal_errors(true);
-//            $domUa = new \DOMDocument();
-//            $domUa->loadHTML($result);
-//            $clearDataUa = $domUa->getElementById('table_17');
-//            if (!$clearDataUa) {
-//                $clearDataUa = $domUa->getElementById('table_2');
-//            }
-//            if (!$clearDataUa) {
-//                $clearDataUa = $domUa->getElementById('table_1');
-//            }
-//            if (!$clearDataUa) {
-//                $clearDataUa = $domUa->getElementById('table_18');
-//            }
-//
-//            if ($clearDataUa) {
-//                $dataUa = $this->getElementsByClass($clearDataUa, 'td', 'result_row_main');
-//                foreach ($dataUa as $element) {
-//                    $translate .= $element->nodeValue . ', ';
-//                }
-//                $translate = stristr($translate, '1');
-//                $pos = strpos($translate, '2');
-//                $translate = substr($translate, 0, $pos);
-//                $translate = mb_substr($translate, 2, mb_strlen($translate));
-//            }
-//        }
+        //        if (!$translate) {
+        //            $baseService = new BaseService('https://e2u.org.ua/s?w=', [], false, 'dict');
+        //            $result = $baseService->getContents($wordName . '&dicts=all');
+        //            libxml_use_internal_errors(true);
+        //            $domUa = new \DOMDocument();
+        //            $domUa->loadHTML($result);
+        //            $clearDataUa = $domUa->getElementById('table_17');
+        //            if (!$clearDataUa) {
+        //                $clearDataUa = $domUa->getElementById('table_2');
+        //            }
+        //            if (!$clearDataUa) {
+        //                $clearDataUa = $domUa->getElementById('table_1');
+        //            }
+        //            if (!$clearDataUa) {
+        //                $clearDataUa = $domUa->getElementById('table_18');
+        //            }
+        //
+        //            if ($clearDataUa) {
+        //                $dataUa = $this->getElementsByClass($clearDataUa, 'td', 'result_row_main');
+        //                foreach ($dataUa as $element) {
+        //                    $translate .= $element->nodeValue . ', ';
+        //                }
+        //                $translate = stristr($translate, '1');
+        //                $pos = strpos($translate, '2');
+        //                $translate = substr($translate, 0, $pos);
+        //                $translate = mb_substr($translate, 2, mb_strlen($translate));
+        //            }
+        //        }
 
         if (!$translate) {
             $baseService = new BaseService(
                 'https://dict.com/%D0%B0%D0%BD%D0%B3%D0%BB%D1%96%D0%B8%D1%81%D1%8C%D0%BA%D0%BE-%D1%83%D0%BA%D1%80%D0%B0%D1%96%D0%BD%D1%81%D1%8C%D0%BA%D0%B8%D0%B8/',
                 [],
                 false,
-                'dict'
+                'dict',
             );
             $result = $baseService->getContents($wordName);
             if ($result) {
@@ -409,7 +404,44 @@ class WordController extends Controller
         $translate = mb_substr($translate, 0, mb_strlen($translate) - 2);
         if (mb_strlen($translate) > 500) {
             $translate = mb_substr($translate, 0, mb_strlen($translate) - (mb_strlen($translate) - 499));
+        } else {
+            $client = new GuzzleHttp\Client();
+            $subscriptionKey = config('app.translator_key');
+            if (empty($subscriptionKey)) {
+                return response()->json(['status' => 'error', 'message' => 'Translator key is not configured'], 500);
+            }
+
+            $baseUrl = 'https://api.cognitive.microsofttranslator.com/translate';
+
+            $headers = [
+                'Ocp-Apim-Subscription-Key' => $subscriptionKey,
+                'Ocp-Apim-Subscription-Region' => 'eastus',
+                'Content-type' => 'application/json',
+                'X-ClientTraceId' => (string) Str::uuid(),
+            ];
+
+            $data = [['text' => $wordName]];
+
+            $response = $client->request('POST', $baseUrl . '?from=en&to=uk&api-version=3.0', [
+                'headers' => $headers,
+                'json' => $data,
+            ]);
+            $response = json_decode($response->getBody()->getContents());
+            $translate2 = '';
+            foreach ($response as $item) {
+                $translate2 .= $item->translations[0]->text . ', ';
+            }
+            $translate2 = mb_substr($translate2, 0, mb_strlen($translate2) - 2);
+
+            // Ensure translate2 is included in translate (append with comma if missing)
+            $translate = trim($translate);
+            $translate2 = trim($translate2);
+            if ($translate2 !== '' && mb_stripos($translate, $translate2) === false) {
+                $translate = $translate !== '' ? $translate . ', ' . $translate2 : $translate2;
+            }
         }
+
+        dd($translate);
         echo $translate;
         echo $data;
         $plural = '';
@@ -433,12 +465,12 @@ class WordController extends Controller
                 'pasp' => $pasp,
                 'pasp2' => $pasp2,
                 'ing' => $ing,
-                'plural' => $plural
+                'plural' => $plural,
             ]);
 
             $user->words()->attach($word->id);
         }
-        $pieces = explode(" ", $wordName);
+        $pieces = explode(' ', $wordName);
         if (count($pieces) > 1) {
             UserWord::where('word_id', $word->id)->update(['audio_test' => 1]);
         }
@@ -470,7 +502,7 @@ class WordController extends Controller
 
     protected function getElementsByClass(&$parentNode, $tagName, $className): array
     {
-        $nodes = array();
+        $nodes = [];
         if ($parentNode) {
             $childNodeList = $parentNode->getElementsByTagName($tagName);
             for ($i = 0; $i < $childNodeList->length; $i++) {
@@ -480,7 +512,6 @@ class WordController extends Controller
                 }
             }
         }
-
 
         return $nodes;
     }

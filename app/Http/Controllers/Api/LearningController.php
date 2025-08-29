@@ -303,7 +303,8 @@ class LearningController extends Controller
                         'text' => $request->get('word')
                     ]
                 ]);
-
+                $data = $response->json();
+                dd($data);
             if (!$response->ok()) {
                 return response()->json([
                     'status' => 'error',
@@ -312,8 +313,7 @@ class LearningController extends Controller
                 ], $response->status());
             }
 
-            $data = $response->json();
-            dd($data);
+            
             return response()->json(['status' => 'success', 'data' => $data], 200);
         } catch (\Throwable $e) {
             return response()->json([

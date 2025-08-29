@@ -54,6 +54,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::get('learning/change_repeat', [LearningController::class, 'changeRepeat']);
         Route::get('learning/count', [LearningController::class, 'count']);
         Route::get('learning/get_repeat', [LearningController::class, 'getRepeat']);
+        Route::get('learning/translate_word', [LearningController::class, 'translateWord']);
         Route::delete('user/{id}', [UserController::class, 'destroy']);
     });
 });

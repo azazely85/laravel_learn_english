@@ -57,6 +57,7 @@ return [
     'url' => env('APP_URL', 'http://localhost'),
     'SANCTUM_STATEFUL_DOMAINS' => env('SANCTUM_STATEFUL_DOMAINS', 'localhost:8081'),
     'asset_url' => env('ASSET_URL'),
+    'translator_key' => env('TRANSLATOR_KEY'),
 
     /*
     |--------------------------------------------------------------------------

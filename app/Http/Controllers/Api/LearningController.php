@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class LearningController extends Controller
 {
@@ -180,16 +182,6 @@ class LearningController extends Controller
                 'count_repeat' => $word->count_repeat + 1,
                 'start_repeat' => Carbon::now()->addDays(($word->count_repeat + 1) * 2)
             ]);
-//        } elseif ($word->count_repeat - 1 > 0) {
-//            $word->update([
-//                'count_repeat' => $word->count_repeat - 1,
-//                'start_repeat' => Carbon::now()->addDays(round($word->count_repeat / 2, 0) - 1)
-//            ]);
-//        } elseif ($word->count_repeat == 1) {
-//            $word->update([
-//                'count_repeat' => 0,
-//                'start_repeat' => Carbon::now()->addDays(1)
-//            ]);
         } else {
             $word->update([
                 'audio_test' => count($pieces) > 1 ? 1 : 0,
@@ -208,37 +200,22 @@ class LearningController extends Controller
     {
         $authUser = Auth::id();
         $from = Carbon::now();
-        $wordsCount = UserWord::where('user_id', $authUser)
-            ->where('tw', 1)
-            ->where('wt', 1)
-            ->where('audio_test', 1)
-            ->where('start_repeat', '<', $from)
-            ->count();
-
-        $wordsAudio = User::where('users.id', $authUser)
-            ->leftJoin('user_word', 'user_word.user_id', '=', 'users.id')
-            ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
-            ->where('user_word.audio_test', 0)
-            ->count();
-
-        $wordsTranslate = User::where('users.id', $authUser)
-            ->leftJoin('user_word', 'user_word.user_id', '=', 'users.id')
-            ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
-            ->where('user_word.wt', 0)
-            ->count();
-
-        $translateWords = User::where('users.id', $authUser)
-            ->leftJoin('user_word', 'user_word.user_id', '=', 'users.id')
-            ->leftJoin('word', 'user_word.word_id', '=', 'word.id')
-            ->where('user_word.tw', 0)
-            ->count();
+        $counts = UserWord::where('user_id', $authUser)
+            ->selectRaw(
+                "SUM(CASE WHEN tw = 1 AND wt = 1 AND audio_test = 1 AND start_repeat < ? THEN 1 ELSE 0 END) as repeat_count,\n" .
+                "SUM(CASE WHEN audio_test = 0 THEN 1 ELSE 0 END) as audio_count,\n" .
+                "SUM(CASE WHEN wt = 0 THEN 1 ELSE 0 END) as wt_count,\n" .
+                "SUM(CASE WHEN tw = 0 THEN 1 ELSE 0 END) as tw_count",
+                [$from]
+            )
+            ->first();
 
         return response()->json([
             'status' => 'success',
-            'repeat' => $wordsCount,
-            'audio' => $wordsAudio,
-            'wt' => $wordsTranslate,
-            'tw' => $translateWords
+            'repeat' => (int) ($counts->repeat_count ?? 0),
+            'audio' => (int) ($counts->audio_count ?? 0),
+            'wt' => (int) ($counts->wt_count ?? 0),
+            'tw' => (int) ($counts->tw_count ?? 0)
         ], 200);
     }
 
@@ -284,5 +261,66 @@ class LearningController extends Controller
             $word->checkTranslate = $toTranslate;
         }
         return response()->json(['status' => 'success', 'data' => $words], 200);
+    }
+
+    /**
+     * Send a translation request to Microsoft Translator API.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function translateWord(Request $request): JsonResponse
+    {
+        $request->validate([
+            'word' => 'required|string|min:1'
+        ]);
+
+        $subscriptionKey = config('app.translator_key');
+        if (empty($subscriptionKey)) {
+            return response()->json(['status' => 'error', 'message' => 'Translator key is not configured'], 500);
+        }
+
+        $baseUrl = 'https://api.cognitive.microsofttranslator.com/translator';
+
+        $headers = [
+            'Ocp-Apim-Subscription-Key' => $subscriptionKey,
+            'Ocp-Apim-Subscription-Region' => 'eastus',
+            'Content-type' => 'application/json',
+            'X-ClientTraceId' => (string) Str::uuid(),
+        ];
+
+        $query = [
+            'api-version' => '3.0',
+            'from' => 'en',
+            'to' => ['ua'],
+        ];
+
+        try {
+            $response = Http::withHeaders($headers)
+                ->withOptions(['query' => $query])
+                ->post($baseUrl, [
+                    [
+                        'text' => $request->get('word')
+                    ]
+                ]);
+
+            if (!$response->ok()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Translation API error',
+                    'details' => $response->json()
+                ], $response->status());
+            }
+
+            $data = $response->json();
+            dd($data);
+            return response()->json(['status' => 'success', 'data' => $data], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to contact translation service',
+                'details' => $e->getMessage()
+            ], 500);
+        }
     }
 }

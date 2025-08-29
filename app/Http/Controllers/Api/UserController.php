@@ -29,7 +29,7 @@ class UserController extends Controller
      */
     public function resetPassword(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        $user = User::find(auth()->user()->id);
         $user->password = bcrypt($request->password);
         $user->first_login = 0;
         $user->save();

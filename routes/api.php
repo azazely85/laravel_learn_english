@@ -40,6 +40,7 @@ Route::group(['prefix' => 'auth'], function () {
 });
 Route::get('word', [WordController::class, 'getWord']);
 Route::get('world/voice/{file_name}', [WordController::class, 'voice']);
+Route::get('learning/translate_word', [LearningController::class, 'translateWord']);
 // api auth routes
 Route::group(['middleware' => ['auth:sanctum']], function() {
 
@@ -54,7 +55,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::get('learning/change_repeat', [LearningController::class, 'changeRepeat']);
         Route::get('learning/count', [LearningController::class, 'count']);
         Route::get('learning/get_repeat', [LearningController::class, 'getRepeat']);
-        Route::get('learning/translate_word', [LearningController::class, 'translateWord']);
+        
         Route::delete('user/{id}', [UserController::class, 'destroy']);
     });
 });

@@ -441,7 +441,7 @@ class WordController extends Controller
             }
         }
 
-        dd($translate);
+        dd($translate2);
         echo $translate;
         echo $data;
         $plural = '';

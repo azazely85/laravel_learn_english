@@ -1,6 +1,5 @@
 <?php
 
-
 use App\Http\Controllers\Api\LearningController;
 use App\Http\Controllers\Api\WordController;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +20,6 @@ use App\Http\Controllers\Api\UserController;
 |   Comment to check 2
 */
 
-
 // auth routes
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -29,10 +27,10 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('forget-password', [AuthController::class, 'sendResetLink']);
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
-    Route::group(['middleware' => 'auth:sanctum'], function() {
+    Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('user', [AuthController::class, 'user']);
-        Route::group(['middleware' => ['admin']], function() {
+        Route::group(['middleware' => ['admin']], function () {
             Route::get('users', [UserController::class, 'users']);
             Route::delete('user/{id}', [UserController::class, 'destroy']);
         });
@@ -40,11 +38,9 @@ Route::group(['prefix' => 'auth'], function () {
 });
 Route::get('word', [WordController::class, 'getWord']);
 Route::get('world/voice/{file_name}', [WordController::class, 'voice']);
-Route::get('learning/translate_word', [LearningController::class, 'translateWord']);
 // api auth routes
-Route::group(['middleware' => ['auth:sanctum']], function() {
-
-    Route::group(['middleware' => ['admin']], function() {
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::group(['middleware' => ['admin']], function () {
         Route::get('user_words', [WordController::class, 'getUserWords']);
 
         Route::get('learning/translate_words', [LearningController::class, 'getTranslateWord']);
@@ -55,7 +51,7 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::get('learning/change_repeat', [LearningController::class, 'changeRepeat']);
         Route::get('learning/count', [LearningController::class, 'count']);
         Route::get('learning/get_repeat', [LearningController::class, 'getRepeat']);
-        
+
         Route::delete('user/{id}', [UserController::class, 'destroy']);
     });
 });

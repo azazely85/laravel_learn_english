@@ -420,11 +420,11 @@ class WordController extends Controller
                 'X-ClientTraceId' => (string) Str::uuid(),
             ];
 
-            $data = [['text' => $wordName]];
+            $data2 = [['text' => $wordName]];
 
             $response = $client->request('POST', $baseUrl . '?from=en&to=uk&api-version=3.0', [
                 'headers' => $headers,
-                'json' => $data,
+                'json' => $data2,
             ]);
             $response = json_decode($response->getBody()->getContents());
             $translate2 = '';
